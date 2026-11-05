@@ -116,10 +116,13 @@ in
     '';
 
     # dlopen()ed at runtime, so autoPatchelf can't see them.
+    # One --enable-features only: Chromium keeps the last one on the CLI, so a
+    # second would silently drop VA-API decode (chrome://flags merges; CLI doesn't).
     preFixup = ''
       gappsWrapperArgs+=(
         --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [libGL libva pipewire libpulseaudio gtk3]}"
-        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}"
+        --add-flags "--enable-features=AcceleratedVideoDecodeLinuxGL,AcceleratedVideoEncoder\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+,WaylandWindowDecorations}}"
+        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-wayland-ime=true}}"
         --add-flags ${lib.escapeShellArg commandLineArgs}
       )
       makeWrapper $out/opt/helium/helium-wrapper $out/bin/helium "''${gappsWrapperArgs[@]}"
