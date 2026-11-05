@@ -20,7 +20,7 @@
 
       update = pkgs.writeShellApplication {
         name = "helium-update";
-        runtimeInputs = with pkgs; [curl jq gnupg nix coreutils];
+        runtimeInputs = with pkgs; [curl jq gnupg nix coreutils gnutar xz gnused];
         text = builtins.readFile ./update.sh;
       };
     };
